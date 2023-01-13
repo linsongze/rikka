@@ -2,14 +2,12 @@ package apiserver
 
 import (
 	"errors"
-	"io/ioutil"
-	"mime/multipart"
-	"net/http"
-	"strings"
-
 	"github.com/7sDream/rikka/api"
 	"github.com/7sDream/rikka/common/util"
 	"github.com/7sDream/rikka/plugins"
+	"io/ioutil"
+	"mime/multipart"
+	"net/http"
 )
 
 var (
@@ -55,15 +53,8 @@ func checkPassword(w http.ResponseWriter, r *http.Request, ip string, from strin
 
 // IsAccepted check a mime file type is accepted by rikka.
 func IsAccepted(fileMimeTypeStr string) (string, bool) {
-	if !strings.HasPrefix(fileMimeTypeStr, "image") {
-		return "", false
-	}
-	for _, acceptedType := range acceptedTypes {
-		if strings.HasSuffix(fileMimeTypeStr, "/"+acceptedType) {
-			return acceptedType, true
-		}
-	}
-	return "", false
+
+	return "", true
 }
 
 func checkUploadedFile(w http.ResponseWriter, file multipart.File, ip string, from string) (*plugins.SaveRequest, bool) {

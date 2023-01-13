@@ -6,7 +6,7 @@ function isImageType(typeStr) {
         return false;
     }
 
-    const accepted = ["jpeg", "bmp", "gif", "png"];
+    const accepted = ["jpeg", "bmp", "gif", "png","avif","jxl"];
     return accepted.some(function(type){
         // noinspection JSUnresolvedFunction
         return typeStr.endsWith("/" + type)
