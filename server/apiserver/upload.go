@@ -2,12 +2,14 @@ package apiserver
 
 import (
 	"errors"
+	"fmt"
 	"github.com/7sDream/rikka/api"
 	"github.com/7sDream/rikka/common/util"
 	"github.com/7sDream/rikka/plugins"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
+	"path"
 )
 
 var (
@@ -57,7 +59,7 @@ func IsAccepted(fileMimeTypeStr string) (string, bool) {
 	return "", true
 }
 
-func checkUploadedFile(w http.ResponseWriter, file multipart.File, ip string, from string) (*plugins.SaveRequest, bool) {
+func checkUploadedFile(w http.ResponseWriter, file multipart.File, header *multipart.FileHeader, ip string, from string) (*plugins.SaveRequest, bool) {
 	fileContent, err := ioutil.ReadAll(file)
 	if err != nil {
 		l.Error("Error happened when get form file content of ip", ip, ":", err)
@@ -76,6 +78,7 @@ func checkUploadedFile(w http.ResponseWriter, file multipart.File, ip string, fr
 	fileType := http.DetectContentType(fileContent)
 
 	ext, ok := IsAccepted(fileType)
+	ext = path.Ext(header.Filename)
 
 	if !ok {
 		l.Error("Form file submitted by", ip, "is not a image, it is a", fileType)
@@ -112,7 +115,8 @@ func checkUploadedFile(w http.ResponseWriter, file multipart.File, ip string, fr
 }
 
 func getUploadedFile(w http.ResponseWriter, r *http.Request, ip string, from string) (*plugins.SaveRequest, bool) {
-	file, _, err := r.FormFile(api.FormKeyFile)
+	file, header, err := r.FormFile(api.FormKeyFile)
+	fmt.Println(header.Filename)
 	if err != nil {
 		// no needed file
 		l.Error("Error happened when get form file from request of", ip, ":", err)
@@ -128,7 +132,7 @@ func getUploadedFile(w http.ResponseWriter, r *http.Request, ip string, from str
 	}
 	l.Debug("Get uploaded file from request of", ip, "successfully")
 
-	pSaveRequest, ok := checkUploadedFile(w, file, ip, from)
+	pSaveRequest, ok := checkUploadedFile(w, file, header, ip, from)
 	if !ok {
 		return nil, false
 	}
